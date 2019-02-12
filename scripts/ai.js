@@ -38,92 +38,6 @@ AIStorage.Wheatley = function(myJumper, enemyJumper, ball, controlPanel, memory)
 
 }
 
-AIStorage.Eli = function(myJumper, enemyJumper, ball, controlPanel, memory){
-    //Calculate where the ball is probably gonna hit the ground
-    let ballIntercept = (ball.pos.x + ball.vel.x * (ball.pos.y)/1.5);
-    
-    if(ballIntercept > 160){
-        ballIntercept = 160 - (ballIntercept - 160);
-    }
-    if(ballIntercept < 0){
-        ballIntercept = -ballIntercept;
-    }
-    ballIntercept -= 4;
-    
-    if(ball.pos.x < 180){
-        if(ball.pos.y < 55){
-            if(Math.abs(ball.pos.x - myJumper.pos.x + (ball.vel.x * 10)) > 2){
-                if(ball.pos.x - 4 + (ball.vel.x * 10) < myJumper.pos.x){
-                    controlPanel.holdKey("left"); 
-                    controlPanel.releaseKey("right"); 
-                }
-                else {
-                    controlPanel.holdKey("right"); 
-                    controlPanel.releaseKey("left");
-                }
-            }
-            else {
-                controlPanel.releaseKey("right");
-                controlPanel.releaseKey("left");
-            }
-        }
-        else {
-            if(Math.abs(ballIntercept - myJumper.pos.x - 4) > 2){
-                if(ballIntercept < myJumper.pos.x){
-                    controlPanel.holdKey("left"); 
-                    controlPanel.releaseKey("right"); 
-                }
-                else {
-                    controlPanel.holdKey("right"); 
-                    controlPanel.releaseKey("left");
-                }
-            }
-            else {
-                controlPanel.releaseKey("right");
-                controlPanel.releaseKey("left");
-            }
-        }
-            
-        if((Math.abs(ballIntercept - myJumper.pos.x) > 10 && ball.vel.y < 0) && myJumper.touchingGround){
-            controlPanel.holdKey("down");
-        }
-        else {
-            controlPanel.releaseKey("down");
-        }
-        
-        if(controlPanel.getKeyData().up == true && myJumper.touchingGround){
-            controlPanel.releaseKey("up");
-        }
-        
-        if(controlPanel.getKeyData().up == true && (ball.vel.y < -0.5 && !(Math.abs(ball.vel.x) < 0.3))){
-            controlPanel.releaseKey("up");
-        }
-        
-        if((Math.abs(ball.pos.x - 4 - myJumper.pos.x) < 6 && ball.pos.y < 60 && ball.vel.y < 0) || (Math.abs(ball.pos.x - myJumper.pos.x) < 16 && ball.pos.y < 25) || (Math.abs(ball.vel.x) < 0.3 && ball.pos.y < 120 && ball.vel.y < -0.5)){
-            if(controlPanel.getKeyData().up == false && myJumper.touchingGround == true){
-                controlPanel.holdKey("up");
-            }
-            else if (ball.pos.y < 120 && myJumper.pos.y > 20 && myJumper.hasSecondJump){
-                controlPanel.holdKey("up");
-            }
-        }
-        if(!myJumper.touchingGround && myJumper.pos.x < ball.pos.x - 5 && Math.abs(myJumper.pos.y - ball.pos.y) < 10){
-            controlPanel.holdKey("right");
-            controlPanel.tapKey("down");
-        }
-    }
-    else if(Math.abs(myJumper.pos.x-80) > 20){
-        if(myJumper.pos.x > 80){
-            controlPanel.holdKey("left"); 
-            controlPanel.releaseKey("right"); 
-        }
-        else {
-            controlPanel.holdKey("right"); 
-            controlPanel.releaseKey("left");
-        }
-    }
-}
-
 AIStorage.Blaze = function(myJumper, enemyJumper, ball, controlPanel, memory){
     
     //DECIDE ON A STATE
@@ -208,7 +122,6 @@ AIStorage.Blaze = function(myJumper, enemyJumper, ball, controlPanel, memory){
     }
     
     if(state == "tapOver"){
-        console.log("gogo")
         if(myJumper.pos.x < ball.pos.x - 2 - 20){
             directionToGo = "right";
         }
@@ -435,4 +348,249 @@ AIStorage.Athena = function(myJumper, enemyJumper, ball, controlPanel){
         controlPanel.releaseKey("left");
     }
     controlPanel.holdKey("up");
+}
+
+AIStorage.Eli = function(myJumper, enemyJumper, ball, controlPanel, memory){
+    //Calculate where the ball is probably gonna hit the ground
+    let ballIntercept = (ball.pos.x + ball.vel.x * (ball.pos.y)/1.5);
+    
+    if(ballIntercept > 160){
+        ballIntercept = 160 - (ballIntercept - 160);
+    }
+    if(ballIntercept < 0){
+        ballIntercept = -ballIntercept;
+    }
+    ballIntercept -= 4;
+    
+    if(ball.pos.x < 180){
+        if(ball.pos.y < 55){
+            if(Math.abs(ball.pos.x - myJumper.pos.x + (ball.vel.x * 10)) > 2){
+                if(ball.pos.x - 4 + (ball.vel.x * 10) < myJumper.pos.x){
+                    controlPanel.holdKey("left"); 
+                    controlPanel.releaseKey("right"); 
+                }
+                else {
+                    controlPanel.holdKey("right"); 
+                    controlPanel.releaseKey("left");
+                }
+            }
+            else {
+                controlPanel.releaseKey("right");
+                controlPanel.releaseKey("left");
+            }
+        }
+        else {
+            if(Math.abs(ballIntercept - myJumper.pos.x - 4) > 2){
+                if(ballIntercept < myJumper.pos.x){
+                    controlPanel.holdKey("left"); 
+                    controlPanel.releaseKey("right"); 
+                }
+                else {
+                    controlPanel.holdKey("right"); 
+                    controlPanel.releaseKey("left");
+                }
+            }
+            else {
+                controlPanel.releaseKey("right");
+                controlPanel.releaseKey("left");
+            }
+        }
+            
+        if((Math.abs(ballIntercept - myJumper.pos.x) > 10 && ball.vel.y < 0) && myJumper.touchingGround){
+            controlPanel.holdKey("down");
+        }
+        else {
+            controlPanel.releaseKey("down");
+        }
+        
+        if(controlPanel.getKeyData().up == true && myJumper.touchingGround){
+            controlPanel.releaseKey("up");
+        }
+        
+        if(controlPanel.getKeyData().up == true && (ball.vel.y < -0.5 && !(Math.abs(ball.vel.x) < 0.3))){
+            controlPanel.releaseKey("up");
+        }
+        
+        if((Math.abs(ball.pos.x - 4 - myJumper.pos.x) < 6 && ball.pos.y < 60 && ball.vel.y < 0) || (Math.abs(ball.pos.x - myJumper.pos.x) < 16 && ball.pos.y < 25) || (Math.abs(ball.vel.x) < 0.3 && ball.pos.y < 120 && ball.vel.y < -0.5)){
+            if(controlPanel.getKeyData().up == false && myJumper.touchingGround == true){
+                controlPanel.holdKey("up");
+            }
+            else if (ball.pos.y < 120 && myJumper.pos.y > 20 && myJumper.hasSecondJump){
+                controlPanel.holdKey("up");
+            }
+        }
+        if(!myJumper.touchingGround && myJumper.pos.x < ball.pos.x - 5 && Math.abs(myJumper.pos.y - ball.pos.y) < 10){
+            controlPanel.holdKey("right");
+            controlPanel.tapKey("down");
+        }
+    }
+    else if(Math.abs(myJumper.pos.x-80) > 20){
+        if(myJumper.pos.x > 80){
+            controlPanel.holdKey("left"); 
+            controlPanel.releaseKey("right"); 
+        }
+        else {
+            controlPanel.holdKey("right"); 
+            controlPanel.releaseKey("left");
+        }
+    }
+}
+
+AIStorage.Caesar = function(myJumper, enemyJumper, ball, controlPanel, memory){
+    //STATE
+    let bouncePos = undefined;
+    if(!isNaN(ball.predictedBounceIndex) && ball.predictedPath){
+        bouncePos = ball.predictedPath[ball.predictedBounceIndex][0];
+    }
+    
+    var distanceFromBall = Math.sqrt(Math.pow(ball.pos.x - myJumper.pos.x, 2) + Math.pow(ball.pos.y - myJumper.pos.y, 2));
+    let state = "none";
+    
+    if(!isNaN(bouncePos) && bouncePos < 160){
+        state = "doink";
+    }
+    if(((Math.abs(ball.vel.x) < 0.8 && ball.pos.y > 60 && ball.pos.y > 80) || !myJumper.touchingGround) && ball.pos.x < 160){
+        state = "sendOver";
+        if(ball.pos.x > 160){
+            state = "none";
+        }
+    }
+    
+    //QUEUE ACTION
+    let directionToGo = "none";
+    
+    if(state == "doink"){
+        let marginOfError = 3;
+        if(bouncePos - marginOfError + (ball.vel.x * 5) > myJumper.pos.x){
+            directionToGo = "right";
+        }
+        else if(bouncePos + marginOfError + (ball.vel.x * 5) < myJumper.pos.x) {
+            directionToGo = "left";
+        }
+        else {
+            directionToGo = "none";
+        }
+        
+        if(Math.abs((bouncePos) - myJumper.pos.x) > 10 && myJumper.touchingGround && ball.vel.y < 0){
+            controlPanel.holdKey("down");
+        }
+        else {
+            controlPanel.releaseKey("down");
+        }
+        
+        if(ball.pos.y < 29 && ball.vel.y < 0 && Math.abs(ball.pos.x - myJumper.pos.x) < 10 && myJumper.touchingGround){
+            controlPanel.releaseKey("up");
+            controlPanel.holdKey("up");
+        }
+        
+        if(Math.abs(ball.vel.x) > 1.5 && ball.predictedBounceIndex < 10){
+            if(directionToGo == "none"){
+                controlPanel.releaseKey("up");
+                controlPanel.holdKey("up");
+            }
+        }
+    }
+    
+    if(state == "sendOver"){
+        let target = undefined;
+        let targetI = undefined;
+        for(let i = 0; i < ball.predictedPath.length; i++){
+            let ballPosX = ball.predictedPath[i][0];
+            let ballPosY = ball.predictedPath[i][1];
+            if(ballPosY < 90){
+                if(!target){
+                    targetI = i;
+                    target = [ballPosX, ballPosY]
+                    break;
+                }
+            }
+        }
+        
+        let xTargetOnBall = -8;
+        if(ball.vel.x > 0.1){
+            xTargetOnBall = -8;
+        }
+        if(ball.vel.x > 0.3){
+            xTargetOnBall = 3;
+        }
+        if(ball.vel.x < -0.1){
+            xTargetOnBall = 8;
+        }
+        if(ball.vel.x < -0.3){
+            xTargetOnBall = -3;
+        }
+        if(myJumper.touchingGround || ball.pos.y < 60){
+            xTargetOnBall = 0;
+        }
+        
+        if(target){
+            if(myJumper.pos.x < target[0] - 2 + xTargetOnBall){
+                directionToGo = "right";
+            }
+            else if(myJumper.pos.x > target[0] + 2 + xTargetOnBall) {
+                directionToGo = "left";
+            }
+            else {
+                directionToGo = "none";
+            }
+            
+            if(Math.abs((target[0] + 2 + xTargetOnBall) - myJumper.pos.x) > 10 && myJumper.touchingGround && ball.vel.y < 0){
+                controlPanel.holdKey("down");
+            }
+            else {
+                controlPanel.releaseKey("down");
+            }
+            
+            if(myJumper.pos.x < target[0] + 3 + xTargetOnBall && myJumper.pos.x > target[0] - 3 + xTargetOnBall && myJumper.vel.x < 0.001 && myJumper.touchingGround && ball.vel.y < 0.05 && targetI < 5){
+                controlPanel.holdKey("up");
+            }
+            
+        }
+        
+        if(target && !myJumper.touchingGround && Math.abs(myJumper.pos.x - target[0]) < 10){
+            if(myJumper.hasSecondJump && myJumper.vel.y < 0.5 && target[1] - 30 > myJumper.pos.y && ball.vel.y < 0.05){
+                controlPanel.holdKey("up");
+            }
+        }
+        
+        if(myJumper.pos.y < ball.pos.y && myJumper.pos.y > ball.pos.y - 15){
+            if(myJumper.pos.x < ball.pos.x){
+                directionToGo = "right";
+            }
+            if(myJumper.pos.x > ball.pos.x){
+                directionToGo = "left";
+            }
+        }
+        
+        if(myJumper.pos.x > 145){
+            directionToGo = "left";
+        }
+    }
+    
+    if(state == "none"){
+        controlPanel.releaseKey("down");
+        if(myJumper.pos.x < 35){
+            directionToGo = "right";
+        }
+        else if(myJumper.pos.x > 50){
+            directionToGo = "left";
+        }
+        else {
+            directionToGo = "none";
+        }
+    }
+    
+    //PERFORM ACTION
+    if(directionToGo == "none"){
+        controlPanel.releaseKey("left");
+        controlPanel.releaseKey("right");
+    }
+    else if(directionToGo == "right"){
+        controlPanel.holdKey("right");
+        controlPanel.releaseKey("left");
+    }
+    else if(directionToGo == "left"){
+        controlPanel.holdKey("left");
+        controlPanel.releaseKey("right");
+    }
 }

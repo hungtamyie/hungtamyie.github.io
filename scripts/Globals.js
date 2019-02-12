@@ -25,4 +25,4 @@ var centerWallLeft = 157.5;
 var centerWallRight = 162.5;
 var centerWallHeight = 116;
 var centerWallBallRadius = 2.5;
-var dangerTime = 15;
+var dangerTime = 8;

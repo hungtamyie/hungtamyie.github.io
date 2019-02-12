@@ -141,7 +141,7 @@ class Jumper{
         this.pos.y += this.vel.y * fpsCoefficient;
         this.vel.y += GRAVITY * fpsCoefficient;
         
-        if(this.pos.y + this.radius > floorY - 1){
+        if(this.pos.y + this.radius + this.vel.y > floorY){
             this.touchingGround = true;
             this.flying = false;
             this.hasFlip = true;
@@ -192,6 +192,9 @@ class Jumper{
             jumperHitSound.currentTime = 0;
             jumperHitSound.volume = volume;
             jumperHitSound.play();
+        }
+        if(y == this.pos.y){
+            this.touchingGround = true;
         }
     }
     

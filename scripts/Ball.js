@@ -21,6 +21,11 @@ class Ball{
         this.hasHitSide = "none";
         this.flashTimer = 0;
         this.dangerStart = 0;
+        this.isSimulating = false;
+        this.predictedPosition = [];
+        this.predictedInversePosition = [];
+        this.predictedBounceIndex = undefined;
+        this.predictedInverseBounceIndex = undefined;
         
         this.MAX_TRAIL_COOLDOWN = 8;
         this.TRAIL_LENGTH = 15;
@@ -34,6 +39,7 @@ class Ball{
         this.SPIN_FACTOR = 0.006;
         this.TERM_VEL = 1.5;
         this.FLASH_TIME = 25;
+        this.PREDICTION_AMOUNT = 150;
     }
     
     updateStats(gameStats){
@@ -43,6 +49,50 @@ class Ball{
         else if(this.pos.x > 160 && game.canMove) {
             gameStats.ballTimeOnRight++;
         }
+    }
+    
+    predictPosition(){
+        this.isSimulating = true;
+        this.predictedPosition = [];
+        this.predictedInversePosition = [];
+        this.predictedBounceIndex = undefined;
+        this.predictedInverseBounceIndex = undefined;
+        let lastPos = {x: this.pos.x, y: this.pos.y};
+        let lastVel = new Vector(this.vel.x, this.vel.y);
+        let lastSpin = this.spin;
+        let lastAngle = this.angle;
+        let hasBounced = false;
+        let predictionLoops = this.PREDICTION_AMOUNT / (fpsCoefficient || 1);
+        let timeBetweenPushes = predictionLoops/50;
+        for(let i = 0; i < predictionLoops; i++){
+            this.lpos = {x: this.pos.x, y: this.pos.y};
+            this.pos.x += this.vel.x * fpsCoefficient;
+            this.pos.y += this.vel.y * fpsCoefficient;
+            this.vel.y += GRAVITY * fpsCoefficient;
+            this.angle += this.spin * this.VISUAL_SPIN_COEFFICIENT * fpsCoefficient;
+            let newDir = this.vel.getDirection() + this.spin * this.SPIN_FACTOR * fpsCoefficient;
+            this.vel.setDirection(newDir);
+            bounceOffWalls(this);
+            
+            if(i % timeBetweenPushes < 1){
+                this.predictedPosition.push([this.pos.x, floorY - this.pos.y]);
+                this.predictedInversePosition.push([320 - this.pos.x, floorY - this.pos.y]);
+            }
+            
+            if(!hasBounced){
+                if(this.pos.y + this.radius > floorY - 15){
+                    this.predictedBounceIndex = this.predictedPosition.length-1;
+                    this.predictedInverseBounceIndex = this.predictedPosition.length-1;
+                    hasBounced = true;
+                }
+            }
+        }
+        
+        this.pos = lastPos;
+        this.vel = lastVel;
+        this.spin = lastSpin;
+        this.angle = lastAngle;
+        this.isSimulating = false;
     }
     
     updatePos(){
@@ -162,6 +212,7 @@ class Ball{
     }
     
     collided(x, y, force, collisionWithCenterWall){
+        if(this.isSimulating) return;
         addSparks(x, y, Math.floor(force));
         
         if(x == this.pos.x){

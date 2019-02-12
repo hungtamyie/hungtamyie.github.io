@@ -4,7 +4,7 @@ var game;
 var titleScreen;
 var Images = {};
 var fpsCoefficient = 1;
-var defaultAI = "Eli";
+var defaultAI = "Caesar";
 var soundSetting = "on";
 var infiniteBoostSetting = "on";
 

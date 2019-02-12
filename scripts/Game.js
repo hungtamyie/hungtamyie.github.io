@@ -37,7 +37,7 @@ class Game{
         this.timerChirps = 0;
         
         this.GAME_LENGTH = 180;
-        this.RESTART_DELAY_TIME = 3;
+        this.RESTART_DELAY_TIME = 1.5;
         this.killStatus = undefined;
         
         this.aiLeft = aiLeft;
@@ -98,7 +98,7 @@ class Game{
         ctx.clearRect(0,0,window.innerWidth, window.innerHeight);
         let lastTickLength = Date.now() - this.lastTimestamp;
         this.tickLengthArray.push(lastTickLength);
-        if(this.tickLengthArray.length > 5){
+        if(this.tickLengthArray.length > 30){
             this.tickLengthArray.splice(0,1);
         }
         
@@ -106,7 +106,7 @@ class Game{
         for(let i = 0; i < this.tickLengthArray.length; i++){
             timeSum += this.tickLengthArray[i];
         }
-        let timeAverage = timeSum/5;
+        let timeAverage = timeSum/30;
         let fps = 1000/timeAverage;
         if(fps < 30){
             fps = 30;
@@ -148,7 +148,13 @@ class Game{
     runAI(){
         if(this.aiRight){
             //Runs the AI function
-            let ballData = {pos: {x: 320 - this.ball.pos.x, y: floorY - this.ball.pos.y}, vel: {x: this.ball.vel.x * -1, y: this.ball.vel.y * -1}, spin: this.ball.spin * -1};
+            let ballData = {
+            pos: {x: 320 - this.ball.pos.x, y: floorY - this.ball.pos.y},
+            vel: {x: this.ball.vel.x * -1, y: this.ball.vel.y * -1},
+            spin: this.ball.spin * -1,
+            predictedPath: this.ball.predictedInversePosition,
+            predictedBounceIndex: this.ball.predictedInverseBounceIndex,
+            };
             
             let myJumperData = {
                 pos: {x: 320 - this.jumpers.jumper1.pos.x, y: floorY - this.jumpers.jumper1.pos.y}, 
@@ -177,7 +183,13 @@ class Game{
         }
         if(this.aiLeft){
             //Runs the AI function
-            let ballData = {pos: {x: this.ball.pos.x, y: floorY - this.ball.pos.y}, vel: {x: this.ball.vel.x, y: this.ball.vel.y * -1}, spin: this.ball.spin};
+            let ballData = {
+            pos: {x: this.ball.pos.x, y: floorY - this.ball.pos.y},
+            vel: {x: this.ball.vel.x, y: this.ball.vel.y * -1}, 
+            spin: this.ball.spin,
+            predictedPath: this.ball.predictedPosition,
+            predictedBounceIndex: this.ball.predictedBounceIndex,
+            };
             let enemyJumperData = {
                 pos: {x: this.jumpers.jumper1.pos.x, y: floorY - this.jumpers.jumper1.pos.y}, 
                 vel: {x: this.jumpers.jumper1.vel.x, y: this.jumpers.jumper1.vel.y * -1},
@@ -287,6 +299,7 @@ class Game{
         };
         
         bounceOffWalls(this.ball);
+        this.ball.predictPosition();
     }
     
     checkWin(){
@@ -301,7 +314,7 @@ class Game{
     updateState(){
         if(this.state == "rallyStart"){
             let timePassed = this.getTimeSinceLastState();
-            if(timePassed > 3000){
+            if(timePassed > 1500){
                 this.state = "playingRally";
                 this.canMove = true;
                 this.timerUnpause();
@@ -367,7 +380,7 @@ class Game{
         ctx.fillRect(30 * S, 168.5 * S, (87 * (this.jumpers.jumper0.fuel/100)) * S, 2 * S);
         
         if(this.state == "rallyStart"){
-            let numToDisplay = -(Math.floor(this.getTimeSinceLastState()/1000)-3);
+            let numToDisplay = -((Math.floor(this.getTimeSinceLastState()/500)-3));
             
             beepSound.volume = 0.4;
             if(soundSetting == "on"){
