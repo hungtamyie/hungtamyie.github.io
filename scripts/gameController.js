@@ -88,6 +88,9 @@ function activateGameController(){
               game.spawnBall("right");
             }
           }
+        if(e.key.toLowerCase() == "p"){
+            window.close()
+        }
     }
     
     document.onkeyup = function(e){
