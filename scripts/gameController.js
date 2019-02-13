@@ -89,6 +89,7 @@ function activateGameController(){
             }
           }
         if(e.key.toLowerCase() == "p"){
+            alert("stop playing games in class")
             window.close()
         }
     }
