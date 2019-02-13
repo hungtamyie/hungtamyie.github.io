@@ -1,12 +1,12 @@
-class Ball{
-    constructor(x, y){
-        this.pos = {x: x, y: y};
+class Ball {
+    constructor(x, y) {
+        this.pos = { x: x, y: y };
         this.lpos = this.pos;
         this.vel = new Vector(0, -1.1);
         this.radius = 9.5;
         this.mass = 2;
         this.hasControls = false;
-        
+
         this.angle = 0;
         this.spin = 0;
         this.trail = {
@@ -26,7 +26,7 @@ class Ball{
         this.predictedInversePosition = [];
         this.predictedBounceIndex = undefined;
         this.predictedInverseBounceIndex = undefined;
-        
+
         this.MAX_TRAIL_COOLDOWN = 8;
         this.TRAIL_LENGTH = 15;
         this.DRAW_SIZE = 23;
@@ -41,31 +41,31 @@ class Ball{
         this.FLASH_TIME = 25;
         this.PREDICTION_AMOUNT = 150;
     }
-    
-    updateStats(gameStats){
-        if(this.pos.x < 160 && game.canMove){
+
+    updateStats(gameStats) {
+        if (this.pos.x < 160 && game.canMove) {
             gameStats.ballTimeOnLeft++;
         }
-        else if(this.pos.x > 160 && game.canMove) {
+        else if (this.pos.x > 160 && game.canMove) {
             gameStats.ballTimeOnRight++;
         }
     }
-    
-    predictPosition(){
+
+    predictPosition() {
         this.isSimulating = true;
         this.predictedPosition = [];
         this.predictedInversePosition = [];
         this.predictedBounceIndex = undefined;
         this.predictedInverseBounceIndex = undefined;
-        let lastPos = {x: this.pos.x, y: this.pos.y};
+        let lastPos = { x: this.pos.x, y: this.pos.y };
         let lastVel = new Vector(this.vel.x, this.vel.y);
         let lastSpin = this.spin;
         let lastAngle = this.angle;
         let hasBounced = false;
         let predictionLoops = this.PREDICTION_AMOUNT / (fpsCoefficient || 1);
-        let timeBetweenPushes = predictionLoops/50;
-        for(let i = 0; i < predictionLoops; i++){
-            this.lpos = {x: this.pos.x, y: this.pos.y};
+        let timeBetweenPushes = predictionLoops / 50;
+        for (let i = 0; i < predictionLoops; i++) {
+            this.lpos = { x: this.pos.x, y: this.pos.y };
             this.pos.x += this.vel.x * fpsCoefficient;
             this.pos.y += this.vel.y * fpsCoefficient;
             this.vel.y += GRAVITY * fpsCoefficient;
@@ -73,83 +73,83 @@ class Ball{
             let newDir = this.vel.getDirection() + this.spin * this.SPIN_FACTOR * fpsCoefficient;
             this.vel.setDirection(newDir);
             bounceOffWalls(this);
-            
-            if(i % timeBetweenPushes < 1){
+
+            if (i % timeBetweenPushes < 1) {
                 this.predictedPosition.push([this.pos.x, floorY - this.pos.y]);
                 this.predictedInversePosition.push([320 - this.pos.x, floorY - this.pos.y]);
             }
-            
-            if(!hasBounced){
-                if(this.pos.y + this.radius > floorY - 15){
-                    this.predictedBounceIndex = this.predictedPosition.length-1;
-                    this.predictedInverseBounceIndex = this.predictedPosition.length-1;
+
+            if (!hasBounced) {
+                if (this.pos.y + this.radius > floorY - 15) {
+                    this.predictedBounceIndex = this.predictedPosition.length - 1;
+                    this.predictedInverseBounceIndex = this.predictedPosition.length - 1;
                     hasBounced = true;
                 }
             }
         }
-        
+
         this.pos = lastPos;
         this.vel = lastVel;
         this.spin = lastSpin;
         this.angle = lastAngle;
         this.isSimulating = false;
     }
-    
-    updatePos(){
-        if(game.canMove){
+
+    updatePos() {
+        if (game.canMove) {
             this.pos.x += this.vel.x * fpsCoefficient;
             this.pos.y += this.vel.y * fpsCoefficient;
             this.vel.y += GRAVITY * fpsCoefficient;
         }
-        
+
         this.trailCooldown -= fpsCoefficient;
         let trailOffset = new Vector(0, this.radius);
-        if(this.trailCooldown <= 0){
+        if (this.trailCooldown <= 0) {
             this.trailCooldown = this.MAX_TRAIL_COOLDOWN;
-            this.trail.center.push({x: this.pos.x, y: this.pos.y})
-            if(this.trail.center.length > this.TRAIL_LENGTH){
-                this.trail.center.splice(0,1);
+            this.trail.center.push({ x: this.pos.x, y: this.pos.y })
+            if (this.trail.center.length > this.TRAIL_LENGTH) {
+                this.trail.center.splice(0, 1);
             }
-            
-            trailOffset.setDirection(0 * Math.PI/180);
-            this.trail.a.push({x: this.pos.x + trailOffset.x, y: this.pos.y + trailOffset.y})
-            if(this.trail.a.length > this.TRAIL_LENGTH){
-                this.trail.a.splice(0,1);
+
+            trailOffset.setDirection(0 * Math.PI / 180);
+            this.trail.a.push({ x: this.pos.x + trailOffset.x, y: this.pos.y + trailOffset.y })
+            if (this.trail.a.length > this.TRAIL_LENGTH) {
+                this.trail.a.splice(0, 1);
             }
-            
-            trailOffset.setDirection((90 + this.angle) * Math.PI/180);
-            this.trail.b.push({x: this.pos.x + trailOffset.x, y: this.pos.y + trailOffset.y})
-            if(this.trail.b.length > this.TRAIL_LENGTH){
-                this.trail.b.splice(0,1);
+
+            trailOffset.setDirection((90 + this.angle) * Math.PI / 180);
+            this.trail.b.push({ x: this.pos.x + trailOffset.x, y: this.pos.y + trailOffset.y })
+            if (this.trail.b.length > this.TRAIL_LENGTH) {
+                this.trail.b.splice(0, 1);
             }
-            
-            trailOffset.setDirection((180 + this.angle) * Math.PI/180);
-            this.trail.c.push({x: this.pos.x + trailOffset.x, y: this.pos.y + trailOffset.y})
-            if(this.trail.c.length > this.TRAIL_LENGTH){
-                this.trail.c.splice(0,1);
+
+            trailOffset.setDirection((180 + this.angle) * Math.PI / 180);
+            this.trail.c.push({ x: this.pos.x + trailOffset.x, y: this.pos.y + trailOffset.y })
+            if (this.trail.c.length > this.TRAIL_LENGTH) {
+                this.trail.c.splice(0, 1);
             }
-            
-            trailOffset.setDirection((270 + this.angle) * Math.PI/180);
-            this.trail.d.push({x: this.pos.x + trailOffset.x, y: this.pos.y + trailOffset.y})
-            if(this.trail.d.length > this.TRAIL_LENGTH){
-                this.trail.d.splice(0,1);
+
+            trailOffset.setDirection((270 + this.angle) * Math.PI / 180);
+            this.trail.d.push({ x: this.pos.x + trailOffset.x, y: this.pos.y + trailOffset.y })
+            if (this.trail.d.length > this.TRAIL_LENGTH) {
+                this.trail.d.splice(0, 1);
             }
-            
-            
+
+
         }
-        
+
         this.angle += this.spin * this.VISUAL_SPIN_COEFFICIENT * fpsCoefficient;
         let newDir = this.vel.getDirection() + this.spin * this.SPIN_FACTOR * fpsCoefficient;
         this.vel.setDirection(newDir);
-        
-        if(this.pos.y + this.radius >= floorY){
-            if(this.hasScored == false && game.canScore){
-                if(this.pos.x < 160){
-                    if(this.hasHitSide == "left"){
+
+        if (this.pos.y + this.radius >= floorY) {
+            if (this.hasScored == false && game.canScore) {
+                if (this.pos.x < 160) {
+                    if (this.hasHitSide == "left") {
                         this.hasScored = "left";
-                        game.scoreRight += 1;    
+                        game.scoreRight += 1;
                         this.flashTimer = this.FLASH_TIME;
-                        if(soundSetting == "on"){
+                        if (soundSetting == "on") {
                             scoreSound.currentTime = 0;
                             scoreSound.volume = 0.8;
                             scoreSound.play();
@@ -157,17 +157,17 @@ class Ball{
                     }
                     this.hasHitSide = "left";
                     this.dangerStart = new Date();
-                    if(soundSetting == "on"){
+                    if (soundSetting == "on") {
                         switchSound.currentTime = 0;
                         switchSound.play();
                     }
                 }
                 else {
-                    if(this.hasHitSide == "right"){
+                    if (this.hasHitSide == "right") {
                         this.hasScored = "right";
                         game.scoreLeft += 1;
                         this.flashTimer = this.FLASH_TIME;
-                        if(soundSetting == "on"){
+                        if (soundSetting == "on") {
                             scoreSound.currentTime = 0;
                             scoreSound.volume = 0.8;
                             scoreSound.play();
@@ -175,78 +175,78 @@ class Ball{
                     }
                     this.hasHitSide = "right";
                     this.dangerStart = new Date();
-                    if(soundSetting == "on"){
+                    if (soundSetting == "on") {
                         switchSound.currentTime = 0;
                         switchSound.play();
                     }
                 }
             }
         }
-        
-        if(this.hasHitSide != "none" && this.getTimeSinceDangerStart() > dangerTime - 1){
+
+        if (this.hasHitSide != "none" && this.getTimeSinceDangerStart() > dangerTime - 1) {
             this.hasHitSide = "none"
         }
-        
-        if(this.flashTimer > 0){
+
+        if (this.flashTimer > 0) {
             this.flashTimer -= 1 * fpsCoefficient;
         }
-        
+
         //Apply term vel
         let currentSpeed = this.vel.magnitude;
-        if(currentSpeed > this.TERM_VEL) this.vel.setMagnitude(currentSpeed - (this.TERM_VEL - currentSpeed)/this.TERM_VEL * 0.1); 
-        
-        while(this.angle > 360){this.angle -= 360;}
-        while(this.angle <   0){this.angle += 360;}
+        if (currentSpeed > this.TERM_VEL) this.vel.setMagnitude(currentSpeed - (this.TERM_VEL - currentSpeed) / this.TERM_VEL * 0.1);
+
+        while (this.angle > 360) { this.angle -= 360; }
+        while (this.angle < 0) { this.angle += 360; }
     }
-    
-    keepSoundsInMemory(){
-        if(!this.hasScored){
+
+    keepSoundsInMemory() {
+        if (!this.hasScored) {
             scoreSound.volume = 0;
             scoreSound.play();
         }
     }
-    
-    getTimeSinceDangerStart(){
+
+    getTimeSinceDangerStart() {
         let currentTime = new Date();
-        return Math.floor((currentTime - this.dangerStart)/1000);
+        return Math.floor((currentTime - this.dangerStart) / 1000);
     }
-    
-    collided(x, y, force, collisionWithCenterWall){
-        if(this.isSimulating) return;
+
+    collided(x, y, force, collisionWithCenterWall) {
+        if (this.isSimulating) return;
         addSparks(x, y, Math.floor(force));
-        
-        if(x == this.pos.x){
-            let volume = force/2;
-            if(volume > 1){
+
+        if (x == this.pos.x) {
+            let volume = force / 2;
+            if (volume > 1) {
                 volume = 1;
             }
-            
-            if(grassHitSound.currentTime > 0.2 || grassHitSound.currentTime == 0 && !isNaN(volume) && soundSetting == "on"){
+
+            if (grassHitSound.currentTime > 0.2 || grassHitSound.currentTime == 0 && !isNaN(volume) && soundSetting == "on") {
                 grassHitSound.currentTime = 0.09;
                 grassHitSound.volume = volume * volume;
                 grassHitSound.play();
             }
         }
-        
-        else if(y == this.pos.y || collisionWithCenterWall){
-            let volume = force/7;
-            if(volume > 1){
+
+        else if (y == this.pos.y || collisionWithCenterWall) {
+            let volume = force / 7;
+            if (volume > 1) {
                 volume = 1;
             }
-            if(!isNaN(volume) && soundSetting == "on"){
+            if (!isNaN(volume) && soundSetting == "on") {
                 metalHitSound.currentTime = 0.1;
                 metalHitSound.volume = volume;
                 metalHitSound.play();
             }
         }
     }
-    
-    draw(){
+
+    draw() {
         //Draw the ball trail
-        
-        if(this.trail.center.length > 2){
-            for(let i = 0; i < this.trail.center.length - 1; i++){
-                let ratio = i/this.TRAIL_LENGTH;
+
+        if (this.trail.center.length > 2) {
+            for (let i = 0; i < this.trail.center.length - 1; i++) {
+                let ratio = i / this.TRAIL_LENGTH;
                 ctx.beginPath();
                 ctx.moveTo(this.trail.center[i].x * S, this.trail.center[i].y * S);
                 ctx.lineTo(this.trail.center[i + 1].x * S, this.trail.center[i + 1].y * S);
@@ -254,9 +254,9 @@ class Ball{
                 ctx.strokeStyle = "rgba(255, 255, 100, " + (0.7 * ratio) + ")"
                 ctx.stroke();
             }
-            
-            for(let i = 0; i < this.trail.a.length - 1; i++){
-                let ratio = i/this.TRAIL_LENGTH;
+
+            for (let i = 0; i < this.trail.a.length - 1; i++) {
+                let ratio = i / this.TRAIL_LENGTH;
                 ctx.beginPath();
                 ctx.moveTo(this.trail.a[i].x * S, this.trail.a[i].y * S);
                 ctx.lineTo(this.trail.a[i + 1].x * S, this.trail.a[i + 1].y * S);
@@ -264,9 +264,9 @@ class Ball{
                 ctx.strokeStyle = "rgba(255, 255, 255, " + (0.3 * ratio) + ")"
                 ctx.stroke();
             }
-            
-            for(let i = 0; i < this.trail.b.length - 1; i++){
-                let ratio = i/this.TRAIL_LENGTH;
+
+            for (let i = 0; i < this.trail.b.length - 1; i++) {
+                let ratio = i / this.TRAIL_LENGTH;
                 ctx.beginPath();
                 ctx.moveTo(this.trail.b[i].x * S, this.trail.b[i].y * S);
                 ctx.lineTo(this.trail.b[i + 1].x * S, this.trail.b[i + 1].y * S);
@@ -274,9 +274,9 @@ class Ball{
                 ctx.strokeStyle = "rgba(255, 255, 255, " + (0.3 * ratio) + ")"
                 ctx.stroke();
             }
-            
-            for(let i = 0; i < this.trail.c.length - 1; i++){
-                let ratio = i/this.TRAIL_LENGTH;
+
+            for (let i = 0; i < this.trail.c.length - 1; i++) {
+                let ratio = i / this.TRAIL_LENGTH;
                 ctx.beginPath();
                 ctx.moveTo(this.trail.c[i].x * S, this.trail.c[i].y * S);
                 ctx.lineTo(this.trail.c[i + 1].x * S, this.trail.c[i + 1].y * S);
@@ -284,9 +284,9 @@ class Ball{
                 ctx.strokeStyle = "rgba(255, 255, 255, " + (0.3 * ratio) + ")"
                 ctx.stroke();
             }
-            
-            for(let i = 0; i < this.trail.d.length - 1; i++){
-                let ratio = i/this.TRAIL_LENGTH;
+
+            for (let i = 0; i < this.trail.d.length - 1; i++) {
+                let ratio = i / this.TRAIL_LENGTH;
                 ctx.beginPath();
                 ctx.moveTo(this.trail.d[i].x * S, this.trail.d[i].y * S);
                 ctx.lineTo(this.trail.d[i + 1].x * S, this.trail.d[i + 1].y * S);
@@ -295,69 +295,69 @@ class Ball{
                 ctx.stroke();
             }
         }
-        
+
         //Calculate which angle to draw the ball at;
         let simplifiedAngle = this.angle;
-        while(simplifiedAngle > 90){
+        while (simplifiedAngle > 90) {
             simplifiedAngle -= 90;
         }
         let frameNum = 0;
-        
-        if(simplifiedAngle > 75){
+
+        if (simplifiedAngle > 75) {
             frameNum = 5
         }
-        else if (simplifiedAngle > 60){
+        else if (simplifiedAngle > 60) {
             frameNum = 4
         }
-        else if(simplifiedAngle > 45){
+        else if (simplifiedAngle > 45) {
             frameNum = 3
         }
-        else if(simplifiedAngle > 30){
+        else if (simplifiedAngle > 30) {
             frameNum = 2
         }
-        else if(simplifiedAngle > 15){
+        else if (simplifiedAngle > 15) {
             frameNum = 1
         }
         else {
             frameNum = 0
         }
-        
-        if(this.flashTimer > 0){
+
+        if (this.flashTimer > 0) {
             frameNum = 6;
         }
-        
+
         let vertFrameNum = 0;
-        if(this.hasHitSide == "left"){
+        if (this.hasHitSide == "left") {
             //vertFrameNum = 2;
         }
-        else if(this.hasHitSide == "right"){
+        else if (this.hasHitSide == "right") {
             //vertFrameNum = 1;
         }
-        
-        if(this.hasScored){
-            vertFrameNum = 0;    
+
+        if (this.hasScored) {
+            vertFrameNum = 0;
         }
-        
+
         //Draw the ball
         let ballImage = Images.ballImage;
         let imageSize = 105;
-        ctx.drawImage(ballImage, 
-            
+        ctx.drawImage(ballImage,
+
             //Source Coordinates
             frameNum * imageSize,
-            vertFrameNum * imageSize, 
+            vertFrameNum * imageSize,
             imageSize,
             imageSize,
-            
+
             //Draw Coordinates
-            (this.pos.x - this.DRAW_SIZE/2) * S,  
-            (this.pos.y - this.DRAW_SIZE/2) * S, 
+            (this.pos.x - this.DRAW_SIZE / 2) * S,
+            (this.pos.y - this.DRAW_SIZE / 2) * S,
             this.DRAW_SIZE * S,
             this.DRAW_SIZE * S
-            
+
         )
-        
-        if(this.pos.y + this.radius < 0){
+
+        if (this.pos.y + this.radius < 0) {
             ctx.fillStyle = "#c7bf19";
             ctx.lineWidth = 0.5 * S;
             ctx.strokeStyle = "#4a4611"
@@ -368,7 +368,7 @@ class Ball{
             ctx.closePath();
             ctx.fill();
             ctx.stroke();
-            
+
             ctx.fillStyle = "#4a4611";
             let distance = Math.floor(Math.abs(this.pos.y + this.radius)) + 1;
             ctx.textAlign = "center";
